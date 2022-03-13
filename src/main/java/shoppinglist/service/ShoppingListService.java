@@ -79,7 +79,7 @@ public class ShoppingListService {
         return new ShoppingListResponseDTO(toUpdate);
     }
 
-    public ShoppingList delete(ShoppingList toDelete) throws Exception {
+    public ShoppingList delete(ShoppingList toDelete){
 
         List<ShoppingListDetail> details = toDelete.getDetails();
         for (ShoppingListDetail item : details) {

@@ -2,7 +2,7 @@ package com.example.shoppinglist;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -88,6 +88,43 @@ class ShoppingListServiceTests {
 		assertThat(expected.getDate()).isEqualTo(result.get(0).getDate());
 		assertThat(expected.getTitle()).isEqualTo(result.get(0).getTitle());
 		assertNotNull(expected.getDetails());
+	}
+
+	@Test
+	void itShouldSaveShoppingList() {
+		when(shoppingListRepo.save(any(ShoppingList.class))).thenReturn(entity1);
+		when(shoppingListDetailRepo.saveAll(any())).thenReturn(detailList);
+
+		entity1.setDetails(detailList);
+		ShoppingListResponseDTO expected = new ShoppingListResponseDTO(entity1);
+
+		ShoppingListResponseDTO result =  shoppingListService.create(shoppingListCreateDTO);
+
+		assertThat(expected.getDate()).isEqualTo(result.getDate());
+		assertThat(expected.getTitle()).isEqualTo(result.getTitle());
+		assertNotNull(expected.getDetails());
+		assertThat(expected.getDetails().size()).isEqualTo(result.getDetails().size());
+	}
+
+	@Test
+	void itShouldDeleteShoppingList(){
+		ShoppingList expected = entity1;
+		expected.setDetails(detailList);
+		for (ShoppingListDetail item : expected.getDetails()) {
+			item.applyDelete();
+		}
+		entity1.applyDelete();
+
+		when(shoppingListRepo.save(any(ShoppingList.class))).thenReturn(entity1);
+		when(shoppingListDetailRepo.saveAll(any())).thenReturn(detailList);
+
+		ShoppingList result =  shoppingListService.delete(entity1);
+
+		assertThat(expected.getDate()).isEqualTo(result.getDate());
+		assertThat(expected.getTitle()).isEqualTo(result.getTitle());
+		assertNotNull(expected.getDetails());
+		assertThat(expected.getDetails().size()).isEqualTo(result.getDetails().size());
+		assertThat(expected.getDeletedAt()).isEqualTo(result.getDeletedAt());
 	}
 
 
