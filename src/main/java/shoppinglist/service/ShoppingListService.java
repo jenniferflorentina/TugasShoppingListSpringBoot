@@ -53,7 +53,7 @@ public class ShoppingListService {
         }
     }
 
-    public ShoppingListResponseDTO update(ShoppingListCreateDTO json, ShoppingList toUpdate) throws Exception {
+    public ShoppingListResponseDTO update(ShoppingListCreateDTO json, ShoppingList toUpdate){
         toUpdate.applyUpdate(json);
         List<Integer> ids = new ArrayList<>();
         List<ShoppingListDetail> details = new ArrayList<>();
