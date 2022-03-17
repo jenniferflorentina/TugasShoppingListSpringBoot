@@ -4,9 +4,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
+
+import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.rules.ExpectedException;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -19,6 +22,7 @@ import shoppinglist.repository.ShoppingListDetailRepo;
 import shoppinglist.repository.ShoppingListRepo;
 import shoppinglist.service.ShoppingListService;
 
+import javax.xml.bind.ValidationException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -46,6 +50,9 @@ class ShoppingListServiceTests {
 	ShoppingList entity1;
 	List<ShoppingListDetail> detailList = new ArrayList<>();
 	List<ShoppingListDetail> updateList = new ArrayList<>();
+
+	@Rule
+	public ExpectedException exception = ExpectedException.none();
 
 	@BeforeEach
 	public void initUseCase() throws Exception {
@@ -99,7 +106,7 @@ class ShoppingListServiceTests {
 	}
 
 	@Test
-	void itShouldSaveShoppingList() {
+	void whenSaveWithRightDTO_itShouldSaveShoppingList() throws Exception{
 		when(shoppingListRepo.save(any(ShoppingList.class))).thenReturn(entity1);
 		when(shoppingListDetailRepo.saveAll(any())).thenReturn(detailList);
 
@@ -115,7 +122,22 @@ class ShoppingListServiceTests {
 	}
 
 	@Test
-	void itShouldDeleteShoppingList(){
+	void whenSaveWithWrongDTO_itShouldThrowsError() throws Exception{
+		exception.expect(ValidationException.class);
+		exception.expectMessage("Quantity must be positive!");
+
+		when(shoppingListRepo.save(any(ShoppingList.class))).thenReturn(entity1);
+		when(shoppingListDetailRepo.saveAll(any())).thenReturn(detailList);
+
+		ShoppingListDetailCreateDTO addDto = new ShoppingListDetailCreateDTO(1, "Sugar", -1F,"kg","pack");
+		detailList.add(new ShoppingListDetail(4,addDto, entity1));
+		entity1.setDetails(detailList);
+
+		ShoppingListResponseDTO result =  shoppingListService.create(shoppingListCreateDTO);
+	}
+
+	@Test
+	void whenDelete_itShouldDeleteShoppingList(){
 		ShoppingList expected = entity1;
 		expected.setDetails(detailList);
 		for (ShoppingListDetail item : expected.getDetails()) {
@@ -136,7 +158,7 @@ class ShoppingListServiceTests {
 	}
 
 	@Test
-	void itShouldUpdateShoppingList() {
+	void whenUpdateWithRightDTO_itShouldUpdateShoppingList() {
         when(shoppingListRepo.save(any(ShoppingList.class))).thenReturn(entity1);
 		when(shoppingListDetailRepo.saveAll(any())).thenReturn(updateList);
 

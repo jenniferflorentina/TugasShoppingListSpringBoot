@@ -3,6 +3,8 @@ package shoppinglist.service;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
+import javax.xml.bind.ValidationException;
+
 import shoppinglist.entity.ShoppingList;
 import shoppinglist.entity.ShoppingListDetail;
 import shoppinglist.http.dto.ShoppingListCreateDTO;
@@ -30,8 +32,7 @@ public class ShoppingListService {
     }
 
     @Transactional
-    public ShoppingListResponseDTO create(ShoppingListCreateDTO json){
-        try{
+    public ShoppingListResponseDTO create(ShoppingListCreateDTO json) throws Exception{
             ShoppingList entity = new ShoppingList(json);
 
             entity = shoppingListRepo.save(entity);
@@ -41,6 +42,9 @@ public class ShoppingListService {
             List<ShoppingListDetail> detailEntities = new ArrayList();
 
             for (int i = 0; i < details.size() ; i++) {
+                if(details.get(i).getQuantity() < 0){
+                    throw new ValidationException("Quantity must be positive!");
+                }
                 detailEntities.add(new ShoppingListDetail(i+1, details.get(i),entity));
             }
 
@@ -48,9 +52,6 @@ public class ShoppingListService {
 
             entity.setDetails(detailEntities);
             return new ShoppingListResponseDTO(entity);
-        }catch (Exception e){
-            return null;
-        }
     }
 
     public ShoppingListResponseDTO update(ShoppingListCreateDTO json, ShoppingList toUpdate){

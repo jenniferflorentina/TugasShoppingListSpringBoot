@@ -29,14 +29,9 @@ public class ShoppingListCtrl {
     }
 
     @PostMapping
-    public ResponseEntity<ShoppingListResponseDTO> create(@RequestBody ShoppingListCreateDTO json){
+    public ResponseEntity<ShoppingListResponseDTO> create(@RequestBody ShoppingListCreateDTO json) throws Exception{
         ShoppingListResponseDTO result = service.create(json);
-
-        if(result != null){
-            return ResponseEntity.ok(result);
-        }else {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
+        return ResponseEntity.ok(result);
     }
 
     @PutMapping("{id}")
