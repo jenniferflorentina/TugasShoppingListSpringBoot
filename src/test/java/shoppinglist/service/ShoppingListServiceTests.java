@@ -78,7 +78,7 @@ class ShoppingListServiceTests {
 	}
 
 	@Test
-	void itShouldGetAllShoppingList() {
+	void whenGetAllShoppingList_itShouldReturnListShoppingList() {
 		when(shoppingListRepo.findAllDeletedAtIsNull()).thenReturn(List.of(entity1));
 
 		ShoppingList expected = entity1;
@@ -92,7 +92,7 @@ class ShoppingListServiceTests {
 	}
 
 	@Test
-	void itShouldGetAllShoppingListWithTitleParams() {
+	void whenFindShoppingListByTitle_itShouldGetAllShoppingListWithTitleParams() {
 		when(shoppingListRepo.findByTitleLikeIgnoreCase(any(String.class))).thenReturn(List.of(entity1));
 
 		ShoppingList expected = entity1;
